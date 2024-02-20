@@ -10,7 +10,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MelbergFramework.Infrastructure.Rabbit" Version="6.2.5" />
+    <PackageReference Include="MelbergFramework.Infrastructure.Rabbit" Version="6.2.6" />
   </ItemGroup>
 
 </Project>
