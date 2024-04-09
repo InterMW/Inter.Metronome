@@ -1,9 +1,10 @@
 using MelbergFramework.Infrastructure.Redis;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Redis.Contexts;
 
 public class DefaultContext : RedisContext
 {
-    public DefaultContext(IConfiguration provider) : base(provider) { }
-}
+    public DefaultContext(
+            IOptions<RedisConnectionOptions<DefaultContext>> options,
+            IConnector connector) : base(options.Value, connector) { } }

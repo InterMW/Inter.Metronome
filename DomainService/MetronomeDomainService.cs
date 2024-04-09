@@ -1,5 +1,5 @@
-﻿using Common;
-using Infrastructure.RepositoryCore;
+﻿using Infrastructure.RepositoryCore;
+using MelbergFramework.Core.Time;
 using Microsoft.Extensions.Logging;
 
 namespace DomainService;
@@ -46,7 +46,7 @@ public class MetronomeDomainService : IMetronomeDomainService
                 _tickPublisher.SendSecondTick();
                 _logger.LogInformation("Tick sent.");
 
-                if(_clock.UtcNow.Second == 0)
+                if(_clock.GetUtcNow().Second == 0)
                 {
                     _minuteTickPublisher.SendMinuteTick();
                     _logger.LogInformation("Minute sent.");
@@ -56,6 +56,6 @@ public class MetronomeDomainService : IMetronomeDomainService
         }
     }
 
-    private Task SleepTillThreeQuarterSecond() => Task.Delay(750 - (_clock.UtcNow.Millisecond % 750));
-    private Task SleepTillNextSecond() => Task.Delay(1000 -  _clock.UtcNow.Millisecond);
+    private Task SleepTillThreeQuarterSecond() => Task.Delay(750 - (_clock.GetUtcNow().Millisecond % 750));
+    private Task SleepTillNextSecond() => Task.Delay(1000 -  _clock.GetUtcNow().Millisecond);
 }
