@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-publish:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     env:
       DOCKERFILE: Dockerfile
       PROJECT: Application/Application.csproj
@@ -66,7 +66,7 @@ jobs:
               ${{secrets.DOCKER_HOST}}/${{env.TAG}}
   deploy:
     needs: build-publish
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     env:
       TAG: intermetronome
     steps:
