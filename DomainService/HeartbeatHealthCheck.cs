@@ -10,6 +10,20 @@ public class HeartbeatHealthCheck(IClockLockRepository clockRepo) : HealthCheck
 
     public void MarkTime(long now) => LastHit = now;
 
-    public override async Task<bool> IsOk(CancellationToken token) =>
-        DateTime.UnixEpoch.AddSeconds(await clockRepo.GetAction())> DateTime.UtcNow.AddSeconds(-3);
+    public override async Task<bool> IsOk(CancellationToken token)
+    {
+
+        var result = DateTime.UnixEpoch.AddSeconds(await clockRepo.GetAction())> DateTime.UtcNow.AddSeconds(-3);
+        if(result)
+        {
+
+        Console.WriteLine("healty");
+        }
+        else
+        {
+            Console.WriteLine("unheal  ");
+        }
+
+        return result;
+    }
 }
