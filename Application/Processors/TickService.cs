@@ -4,12 +4,18 @@ namespace Application.Services;
 
 public class TickService : BackgroundService
 {
-    private readonly IMetronomeDomainService _service;
-    public TickService(IMetronomeDomainService service) 
+    private readonly IServiceProvider _service;
+    public TickService(IServiceProvider service) 
     {
         _service = service;
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
-        _service.StartTickGenerator(stoppingToken);
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken) 
+    {
+        while(!stoppingToken.IsCancellationRequested)
+        {
+            using var scope = _service.CreateScope();
+            await scope.ServiceProvider.GetService<IMetronomeDomainService>().RunTick();
+        }
+    }
 }

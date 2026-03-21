@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 namespace DomainService;
 public interface IMetronomeDomainService
 {
-    Task StartTickGenerator(CancellationToken cancellationToken);
+    Task RunTick();
 }
 
 public class MetronomeDomainService : IMetronomeDomainService
@@ -29,32 +29,29 @@ public class MetronomeDomainService : IMetronomeDomainService
         _logger = logger;
     }
 
-    public async Task StartTickGenerator(CancellationToken cancellationToken)
+    public async Task RunTick()
     {
-        while(!cancellationToken.IsCancellationRequested)
-        {
-            var now = (long)(_clock.GetUtcNow()-DateTime.UnixEpoch).TotalSeconds;
-            await _clockLockRepository.ShowAction(now);
-            // figure out ahead of time who should get to send the message
-            await SleepTillThreeQuarterSecond();
+        var now = (long)(_clock.GetUtcNow()-DateTime.UnixEpoch).TotalSeconds;
+        await _clockLockRepository.ShowAction(now);
+        // figure out ahead of time who should get to send the message
+        await SleepTillThreeQuarterSecond();
 
-            var locked = await _clockLockRepository.TryLockClockDocumentAsync();
+        var locked = await _clockLockRepository.TryLockClockDocumentAsync();
+        
+        // Then sleep till it is time to send the messages
+        await SleepTillNextSecond();
             
-            // Then sleep till it is time to send the messages
-            await SleepTillNextSecond();
-                
-            if(locked)
-            {
-                _tickPublisher.SendSecondTick();
-                _logger.LogInformation("Tick sent.");
+        if(locked)
+        {
+            _tickPublisher.SendSecondTick();
+            _logger.LogInformation("Tick sent.");
 
-                if(_clock.GetUtcNow().Second == 0)
-                {
-                    _minuteTickPublisher.SendMinuteTick();
-                    _logger.LogInformation("Minute sent.");
-                }
-                await _clockLockRepository.UnlockClockDocumentAsync();
+            if(_clock.GetUtcNow().Second == 0)
+            {
+                _minuteTickPublisher.SendMinuteTick();
+                _logger.LogInformation("Minute sent.");
             }
+            await _clockLockRepository.UnlockClockDocumentAsync();
         }
     }
 
