@@ -33,6 +33,8 @@ public class MetronomeDomainService : IMetronomeDomainService
     {
         while(!cancellationToken.IsCancellationRequested)
         {
+            var now = (long)(_clock.GetUtcNow()-DateTime.UnixEpoch).TotalSeconds;
+            await _clockLockRepository.ShowAction(now);
             // figure out ahead of time who should get to send the message
             await SleepTillThreeQuarterSecond();
 
