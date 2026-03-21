@@ -6,6 +6,7 @@ using Infrastructure.Redis.Contexts;
 using Infrastructure.Redis.Repositories;
 using Infrastructure.RepositoryCore;
 using MelbergFramework.Application;
+using MelbergFramework.Core.HealthCheck;
 using MelbergFramework.Core.Time;
 using MelbergFramework.Infrastructure.Rabbit;
 using MelbergFramework.Infrastructure.Rabbit.Messages;
@@ -30,6 +31,7 @@ public class AppRegistrator : Registrator
             ClockLockRepository,
             DefaultContext>(services);
         
+        services.AddSingleton<IHealthCheck,HeartbeatHealthCheck>();
         services.AddTransient<ITickPublisher, TickPublisher>();
         services.AddTransient<IMinuteTickPublisher,MinuteTickPublisher>();
 
